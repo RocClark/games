@@ -1,12 +1,13 @@
 
 
-function WrongLetter() {
+function WrongLetters({ wrongLetters }) {
       return (
-        <div className="p-5 px-7 relative mx-auto h-[350px] w-[450px]">
-          
-        </div>
+        <div className="absolute top-0 right-0 text-right">
+        <p>Wrong:</p>
+        <p className="text-red-500">{wrongLetters.join(", ")}</p>
+      </div>
         
       );
   }
   
-export default WrongLetter;
+export default WrongLetters;

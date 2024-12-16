@@ -1,10 +1,17 @@
 
 
-function Word() {
+function Word({selectedWord, correctLetters}) {
       return (
-        <div className="p-5 px-7 relative mx-auto h-[350px] w-[450px]">
-          
-        </div>
+        <div className="mt-8">
+        {selectedWord.split("").map((letter, index) => (
+          <span
+            key={index}
+            className="inline-block border-b-4 border-blue-600 mx-1 text-xl w-8 text-center"
+          >
+            {correctLetters.includes(letter) ? letter : ""}
+          </span>
+        ))}
+      </div>
         
       );
   }

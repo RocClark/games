@@ -1,9 +1,10 @@
 
 
-function GameContainer({children}) {
+function GameContainer() {
       return (
-        <div className="p-5 px-7 relative mx-auto h-[350px] w-[450px]">
-          {children}
+        <div className="text-center">
+      <h1 className="text-4xl font-bold mb-4">Hangman</h1>
+      <p className="mb-6">Find the hidden word - Enter a letter</p>
         </div>
         
       );
