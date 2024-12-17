@@ -1,6 +1,5 @@
 "use client"
-import React from 'react';
-import { useState,useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import GameContainer from '../../components/hangman/GameContainer';
 import Figure from '../../components/hangman/Figure';
 import WrongLetters from '../../components/hangman/WrongLetter';
@@ -9,7 +8,7 @@ import ErrorMessage from '../../components/hangman/ErrorMessage';
 import Message from '../../components/hangman/Message';
 
 export default function Hangman() {
-  const words = ['application', 'programming', 'interface', 'wizard'];
+  const [words, setWords] = useState<string[]>([]); // Store words fetched from API
   const [selectedWord, setSelectedWord] = useState("");
   const [correctLetters, setCorrectLetters] = useState<string[]>([]);
   const [wrongLetters, setWrongLetters] = useState<string[]>([]);
@@ -17,8 +16,14 @@ export default function Hangman() {
   const [gameOverMessage, setGameOverMessage] = useState("");
 
   useEffect(() => {
-    const random = Math.floor(Math.random() * words.length);
-    setSelectedWord(words[random]);
+    fetch("/api/words")
+      .then((response) => response.json())
+      .then((data) => {
+        setWords(data);
+        const randomIndex = Math.floor(Math.random() * data.length);
+        setSelectedWord(data[randomIndex]);
+      })
+      .catch((error) => console.error("Error fetching words:", error));
   }, []);
 
   const showNotification = () => {
@@ -43,6 +48,7 @@ export default function Hangman() {
       }
     }
   };
+
   useEffect(() => {
     const handleWin = () => {
       const word = selectedWord
@@ -62,7 +68,7 @@ export default function Hangman() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [correctLetters, wrongLetters]);
+  }, [correctLetters, wrongLetters, selectedWord]);
 
   const resetGame = () => {
     setCorrectLetters([]);
@@ -73,15 +79,14 @@ export default function Hangman() {
 
   return (
     <div className="flex flex-col items-center bg-gray-800 text-white min-h-screen p-6">
-      <GameContainer/>
-        <div className="relative flex flex-col items-center">
-          <Figure wrongLetters={wrongLetters} />
-          <WrongLetters wrongLetters={wrongLetters} />
-          <Word selectedWord={selectedWord} correctLetters={correctLetters} />
+      <GameContainer />
+      <div className="relative flex flex-col items-center">
+        <Figure wrongLetters={wrongLetters} />
+        <WrongLetters wrongLetters={wrongLetters} />
+        <Word selectedWord={selectedWord} correctLetters={correctLetters} />
       </div>
       <Message gameOverMessage={gameOverMessage} resetGame={resetGame} />
-      <ErrorMessage notification={notification}  />        
+      <ErrorMessage notification={notification} />
     </div>
-  
   );
 }
