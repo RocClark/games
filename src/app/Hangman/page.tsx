@@ -13,7 +13,8 @@ export default function Hangman() {
   const [correctLetters, setCorrectLetters] = useState<string[]>([]);
   const [wrongLetters, setWrongLetters] = useState<string[]>([]);
   const [notification, setNotification] = useState(false);
-  const [gameOverMessage, setGameOverMessage] = useState("");
+  const [gameOverMessage, setGameOverMessage] = useState(""); // Initially empty, no message displayed
+  const [hasStarted, setHasStarted] = useState(false); // Track if the game has started
 
   useEffect(() => {
     fetch("/api/words")
@@ -32,6 +33,11 @@ export default function Hangman() {
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
+    // Only start the game if the user presses a key (i.e., when the user interacts)
+    if (!hasStarted) {
+      setHasStarted(true);
+    }
+
     const letter = e.key.toLowerCase();
 
     if (selectedWord.includes(letter)) {
@@ -54,7 +60,9 @@ export default function Hangman() {
       const word = selectedWord
         .split("")
         .every((letter) => correctLetters.includes(letter));
-      if (word) setGameOverMessage("Congratulations! You won! 😃");
+      if (word) {
+        setGameOverMessage("Congratulations! You won! 😃");
+      }
     };
 
     const handleLose = () => {
@@ -63,17 +71,20 @@ export default function Hangman() {
       }
     };
 
-    handleWin();
-    handleLose();
+    if (hasStarted) {
+      handleWin();
+      handleLose();
+    }
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [correctLetters, wrongLetters, selectedWord]);
+  }, [correctLetters, wrongLetters, selectedWord, hasStarted]);
 
   const resetGame = () => {
     setCorrectLetters([]);
     setWrongLetters([]);
-    setGameOverMessage("");
+    setGameOverMessage(""); // Reset the message when restarting
+    setHasStarted(false); // Reset the game start state
     setSelectedWord(words[Math.floor(Math.random() * words.length)]);
   };
 
@@ -85,7 +96,10 @@ export default function Hangman() {
         <WrongLetters wrongLetters={wrongLetters} />
         <Word selectedWord={selectedWord} correctLetters={correctLetters} />
       </div>
-      <Message gameOverMessage={gameOverMessage} resetGame={resetGame} />
+      
+      {/* Only show the Message component if gameOverMessage is set (game over state) */}
+      {gameOverMessage && <Message gameOverMessage={gameOverMessage} resetGame={resetGame} />}
+
       <ErrorMessage notification={notification} />
     </div>
   );
