@@ -1,23 +1,30 @@
-"use client"
-import React, { useState, useEffect } from 'react';
-import GameContainer from '../../components/hangman/GameContainer';
-import Figure from '../../components/hangman/Figure';
-import WrongLetters from '../../components/hangman/WrongLetter';
-import Word from '../../components/hangman/Word';
-import ErrorMessage from '../../components/hangman/ErrorMessage';
-import Message from '../../components/hangman/Message';
+"use client";
+import React, { useState, useEffect } from "react";
+import GameContainer from "../../components/hangman/GameContainer";
+import Figure from "../../components/hangman/Figure";
+import WrongLetters from "../../components/hangman/WrongLetter";
+import Word from "../../components/hangman/Word";
+import ErrorMessage from "../../components/hangman/ErrorMessage";
+import Message from "../../components/hangman/Message";
 
 export default function Hangman() {
-  const [words, setWords] = useState<string[]>([]); // Store words fetched from API
+  const [categories, setCategories] = useState<string[]>([
+    "Superheroes",
+    "Mountains",
+    "Animals",
+  ]);
+  const [selectedCategory, setSelectedCategory] = useState("Superheroes");
+  const [words, setWords] = useState<string[]>([]);
   const [selectedWord, setSelectedWord] = useState("");
   const [correctLetters, setCorrectLetters] = useState<string[]>([]);
   const [wrongLetters, setWrongLetters] = useState<string[]>([]);
   const [notification, setNotification] = useState(false);
-  const [gameOverMessage, setGameOverMessage] = useState(""); // Initially empty, no message displayed
-  const [hasStarted, setHasStarted] = useState(false); // Track if the game has started
+  const [gameOverMessage, setGameOverMessage] = useState("");
+  const [hasStarted, setHasStarted] = useState(false);
 
+  // Fetch words based on the selected category
   useEffect(() => {
-    fetch("/api/words")
+    fetch(`/api/words?category=${selectedCategory}`)
       .then((response) => response.json())
       .then((data) => {
         setWords(data);
@@ -25,7 +32,7 @@ export default function Hangman() {
         setSelectedWord(data[randomIndex]);
       })
       .catch((error) => console.error("Error fetching words:", error));
-  }, []);
+  }, [selectedCategory]);
 
   const showNotification = () => {
     setNotification(true);
@@ -33,7 +40,6 @@ export default function Hangman() {
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    // Only start the game if the user presses a key (i.e., when the user interacts)
     if (!hasStarted) {
       setHasStarted(true);
     }
@@ -83,23 +89,40 @@ export default function Hangman() {
   const resetGame = () => {
     setCorrectLetters([]);
     setWrongLetters([]);
-    setGameOverMessage(""); // Reset the message when restarting
-    setHasStarted(false); // Reset the game start state
-    setSelectedWord(words[Math.floor(Math.random() * words.length)]);
+    setGameOverMessage("");
+    setHasStarted(false);
+    const randomIndex = Math.floor(Math.random() * words.length);
+    setSelectedWord(words[randomIndex]);
   };
 
   return (
     <div className="flex flex-col items-center bg-gray-800 text-white min-h-screen p-6">
+      <div className="mb-4">
+        <label htmlFor="category" className="mr-2">
+          Select a category:
+        </label>
+        <select
+          id="category"
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          className="p-2 rounded bg-gray-700 text-white"
+        >
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+      </div>
       <GameContainer />
       <div className="relative flex flex-col items-center">
         <Figure wrongLetters={wrongLetters} />
         <WrongLetters wrongLetters={wrongLetters} />
         <Word selectedWord={selectedWord} correctLetters={correctLetters} />
       </div>
-      
-      {/* Only show the Message component if gameOverMessage is set (game over state) */}
-      {gameOverMessage && <Message gameOverMessage={gameOverMessage} resetGame={resetGame} />}
-
+      {gameOverMessage && (
+        <Message gameOverMessage={gameOverMessage} resetGame={resetGame} />
+      )}
       <ErrorMessage notification={notification} />
     </div>
   );
