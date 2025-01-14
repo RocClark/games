@@ -8,10 +8,10 @@ import ErrorMessage from "../../components/hangman/ErrorMessage";
 import Message from "../../components/hangman/Message";
 
 export default function Hangman() {
-  const [categories, setCategories] = useState<string[]>([
+  const [categories] = useState<string[]>([
     "Superheroes",
     "Mountains",
-    "Animals",
+    "Place",
   ]);
   const [selectedCategory, setSelectedCategory] = useState("Superheroes");
   const [words, setWords] = useState<string[]>([]);
@@ -22,16 +22,32 @@ export default function Hangman() {
   const [gameOverMessage, setGameOverMessage] = useState("");
   const [hasStarted, setHasStarted] = useState(false);
 
-  // Fetch words based on the selected category
+  // Fetch words based on the selected category and reset game
   useEffect(() => {
-    fetch(`/api/words?category=${selectedCategory}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setWords(data);
-        const randomIndex = Math.floor(Math.random() * data.length);
-        setSelectedWord(data[randomIndex]);
-      })
-      .catch((error) => console.error("Error fetching words:", error));
+    const fetchWords = async () => {
+      try {
+        const response = await fetch(`/api/words?category=${selectedCategory}`);
+        const data = await response.json();
+
+        if (data.length > 0) {
+          setWords(data);
+          const randomIndex = Math.floor(Math.random() * data.length);
+          setSelectedWord(data[randomIndex]);
+        } else {
+          console.error("No words found for the selected category.");
+        }
+      } catch (error) {
+        console.error("Error fetching words:", error);
+      }
+    };
+
+    // Reset game states
+    setCorrectLetters([]);
+    setWrongLetters([]);
+    setGameOverMessage("");
+    setHasStarted(false);
+
+    fetchWords();
   }, [selectedCategory]);
 
   const showNotification = () => {
@@ -73,7 +89,9 @@ export default function Hangman() {
 
     const handleLose = () => {
       if (wrongLetters.length === 6) {
-        setGameOverMessage("Unfortunately, you lost. 😕");
+        setGameOverMessage(
+          `Unfortunately, you lost. The word was "${selectedWord}". 😕`
+        );
       }
     };
 
@@ -91,6 +109,8 @@ export default function Hangman() {
     setWrongLetters([]);
     setGameOverMessage("");
     setHasStarted(false);
+
+    // Choose a new word
     const randomIndex = Math.floor(Math.random() * words.length);
     setSelectedWord(words[randomIndex]);
   };
@@ -105,6 +125,7 @@ export default function Hangman() {
           id="category"
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
+          onKeyDown={(e) => e.preventDefault()}
           className="p-2 rounded bg-gray-700 text-white"
         >
           {categories.map((category) => (
