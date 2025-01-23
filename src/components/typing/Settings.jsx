@@ -9,7 +9,7 @@ export default function Settings({ difficulty, setDifficulty }) {
     <div className="absolute top-0 left-0 w-full bg-black bg-opacity-30 h-20 flex items-center justify-center">
       <form>
         <div>
-          <label htmlFor="difficulty" className="text-white mr-4">
+          <label htmlFor="difficulty" className="text-black mr-4">
             Difficulty
           </label>
           <select
