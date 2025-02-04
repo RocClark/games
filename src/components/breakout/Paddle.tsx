@@ -8,7 +8,7 @@ export const drawPaddle = (
 ) => {
   ctx.beginPath();
   ctx.rect(x, y, width, height);
-  ctx.fillStyle = color;
+  ctx.fillStyle = color; // Keep only one color
   ctx.fill();
   ctx.closePath();
 };

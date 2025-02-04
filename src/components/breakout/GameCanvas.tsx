@@ -190,13 +190,26 @@ const GameCanvas: React.FC = () => {
         ballRef.current.dy *= -1;
       }
 
-      // Ball-paddle collision
+      // Ball collision with paddle
       if (
         ballRef.current.x > paddleRef.current.x &&
         ballRef.current.x < paddleRef.current.x + paddleRef.current.width &&
         ballRef.current.y + ballRef.current.size > paddleRef.current.y
       ) {
-        ballRef.current.dy = -ballRef.current.speed;
+        const paddleCenter = paddleRef.current.x + paddleRef.current.width / 2;
+        const hitPosition =
+          (ballRef.current.x - paddleCenter) / (paddleRef.current.width / 2);
+
+        // Scale the angle (30° max in either direction)
+        const maxBounceAngle = (60 * Math.PI) / 180; // Convert 30 degrees to radians
+        const bounceAngle = hitPosition * maxBounceAngle;
+
+        // Calculate new direction using sine and cosine
+        const speed = Math.sqrt(
+          ballRef.current.dx ** 2 + ballRef.current.dy ** 2
+        );
+        ballRef.current.dx = speed * Math.sin(bounceAngle);
+        ballRef.current.dy = -speed * Math.cos(bounceAngle);
       }
 
       // Ball falls below canvas (reset game)
