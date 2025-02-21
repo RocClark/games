@@ -48,12 +48,15 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ difficulty }) => {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [paused, setPaused] = useState(false); // NEW: Pause state
+  const [rulesOpen, setRulesOpen] = useState(false); // NEW: Control rules visibility
 
   // Reset game
   const resetGame = () => {
     setScore(0);
     setGameOver(false);
     setGameWon(false);
+    setPaused(false);
 
     ballRef.current = {
       x: 400,
@@ -93,6 +96,8 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ difficulty }) => {
         paddleRef.current.dx = paddleRef.current.speed;
       } else if (e.key === "ArrowLeft") {
         paddleRef.current.dx = -paddleRef.current.speed;
+      } else if (e.key === "Escape") {
+        setRulesOpen(true); // Open rules when Escape is pressed
       }
     };
 
@@ -113,6 +118,8 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ difficulty }) => {
 
   // Game loop
   useEffect(() => {
+    if (paused || gameOver || gameWon) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -121,7 +128,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ difficulty }) => {
     let animationFrameId: number;
 
     const update = () => {
-      if (gameOver || gameWon) return;
+      if (paused || gameOver || gameWon) return;
 
       const ball = ballRef.current;
       const paddle = paddleRef.current;
@@ -212,11 +219,20 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ difficulty }) => {
     update();
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [gameOver, gameWon]);
+  }, [paused, gameOver, gameWon]);
 
   return (
     <div className="relative">
-      <Rules onClose={() => console.log("Rules closed")} />
+      {/* Rules start closed, pause game when opened */}
+      {rulesOpen && (
+        <Rules
+          onClose={() => {
+            setRulesOpen(false);
+            setPaused(false); // Unpause game
+          }}
+        />
+      )}
+
       <canvas
         ref={canvasRef}
         width={800}
