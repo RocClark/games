@@ -7,8 +7,7 @@ import Rules from "../../components/breakout/Rules";
 
 export default function Breakout() {
   const [showRules, setShowRules] = useState(false);
-
-  console.log("showRules state:", showRules); // Debugging
+  const [difficulty, setDifficulty] = useState<"easy" | "hard" | null>(null); // TypeScript-friendly
 
   return (
     <>
@@ -27,17 +26,31 @@ export default function Breakout() {
         </button>
 
         {/* Rules Component */}
-        {showRules && (
-          <Rules
-            onClose={() => {
-              console.log("Closing rules..."); // Debugging
-              setShowRules(false);
-            }}
-          />
+        {showRules && <Rules onClose={() => setShowRules(false)} />}
+
+        {/* Difficulty Selection Modal */}
+        {difficulty === null && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+              <h2 className="text-2xl font-bold mb-4">Choose Difficulty</h2>
+              <button
+                className="bg-green-500 text-white px-4 py-2 rounded m-2 hover:bg-green-700"
+                onClick={() => setDifficulty("easy")}
+              >
+                Easy
+              </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded m-2 hover:bg-red-700"
+                onClick={() => setDifficulty("hard")}
+              >
+                Hard
+              </button>
+            </div>
+          </div>
         )}
 
-        {/* Game Canvas */}
-        <GameCanvas />
+        {/* Game Canvas - Only render if difficulty is chosen */}
+        {difficulty && <GameCanvas difficulty={difficulty} />}
       </div>
     </>
   );
