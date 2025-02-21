@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Head from "next/head";
+import Link from "next/link";
 import GameCanvas from "../../components/breakout/GameCanvas";
 import Rules from "../../components/breakout/Rules";
 
@@ -19,12 +20,19 @@ export default function Breakout() {
 
         {/* Rules Button */}
         <button
-          className="btn absolute top-8 left-8 px-4 py-2 bg-black text-white rounded hover:bg-gray-800 focus:outline-none"
+          className="btn absolute top-8 left-6 px-4 py-2 bg-black text-white rounded hover:bg-gray-800 focus:outline-none"
           onClick={() => setShowRules(true)}
         >
           Show Rules
         </button>
 
+        {/* Link back to the home page */}
+        <Link
+          className="btn absolute top-8 left-40 px- py-2 bg-black text-white rounded hover:bg-gray-800 focus:outline-none"
+          href="./"
+        >
+          Home
+        </Link>
         {/* Rules Component */}
         {showRules && <Rules onClose={() => setShowRules(false)} />}
 
