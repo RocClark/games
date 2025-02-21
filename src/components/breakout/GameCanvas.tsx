@@ -200,7 +200,7 @@ const GameCanvas: React.FC = () => {
         const hitPosition =
           (ballRef.current.x - paddleCenter) / (paddleRef.current.width / 2);
 
-        // Scale the angle (30° max in either direction)
+        // Scale the angle (60° max in either direction)
         const maxBounceAngle = (60 * Math.PI) / 180; // Convert 30 degrees to radians
         const bounceAngle = hitPosition * maxBounceAngle;
 
