@@ -20,7 +20,7 @@ export default function Breakout() {
 
         {/* Rules Button */}
         <button
-          className="btn absolute top-8 left-6 px-4 py-2 bg-black text-white rounded hover:bg-gray-800 focus:outline-none"
+          className="btn absolute top-8 left-6 px-4 py-2 bg-green text-white rounded hover:bg-gray-800 focus:outline-none"
           onClick={() => setShowRules(true)}
         >
           Show Rules
@@ -28,7 +28,7 @@ export default function Breakout() {
 
         {/* Link back to the home page */}
         <Link
-          className="btn absolute top-8 left-40 px- py-2 bg-black text-white rounded hover:bg-gray-800 focus:outline-none"
+          className="btn absolute top-8 left-40 px- py-2 bg-green text-white rounded hover:bg-gray-800 focus:outline-none"
           href="./"
         >
           Home
