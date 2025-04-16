@@ -14,8 +14,11 @@ export default function Hangman() {
     "Place",
   ]);
   const [selectedCategory, setSelectedCategory] = useState("Superheroes");
-  const [words, setWords] = useState<string[]>([]);
+  const [words, setWords] = useState<{ word: string; description: string }[]>(
+    []
+  );
   const [selectedWord, setSelectedWord] = useState("");
+  const [wordDescription, setWordDescription] = useState("");
   const [correctLetters, setCorrectLetters] = useState<string[]>([]);
   const [wrongLetters, setWrongLetters] = useState<string[]>([]);
   const [notification, setNotification] = useState(false);
@@ -32,7 +35,8 @@ export default function Hangman() {
         if (data.length > 0) {
           setWords(data);
           const randomIndex = Math.floor(Math.random() * data.length);
-          setSelectedWord(data[randomIndex]);
+          setSelectedWord(data[randomIndex].word);
+          setWordDescription(data[randomIndex].description);
         } else {
           console.error("No words found for the selected category.");
         }
@@ -62,14 +66,14 @@ export default function Hangman() {
 
     const letter = e.key.toLowerCase();
 
-    if (selectedWord.includes(letter)) {
+    if (selectedWord.toLowerCase().includes(letter)) {
       if (!correctLetters.includes(letter)) {
         setCorrectLetters([...correctLetters, letter]);
       } else {
         showNotification();
       }
     } else {
-      if (!wrongLetters.includes(letter)) {
+      if (!wrongLetters.includes(letter) && letter !== " ") {
         setWrongLetters([...wrongLetters, letter]);
       } else {
         showNotification();
@@ -80,17 +84,22 @@ export default function Hangman() {
   useEffect(() => {
     const handleWin = () => {
       const word = selectedWord
+        .toLowerCase()
         .split("")
+        .filter((char) => char !== " ")
         .every((letter) => correctLetters.includes(letter));
+
       if (word) {
-        setGameOverMessage("Congratulations! You won! 😃");
+        setGameOverMessage(
+          `Congratulations! You won! 😃\n\n${wordDescription}`
+        );
       }
     };
 
     const handleLose = () => {
       if (wrongLetters.length === 6) {
         setGameOverMessage(
-          `Unfortunately, you lost. The word was "${selectedWord}". 😕`
+          `Unfortunately, you lost. The word was "${selectedWord}". 😕\n\n${wordDescription}`
         );
       }
     };
@@ -112,7 +121,8 @@ export default function Hangman() {
 
     // Choose a new word
     const randomIndex = Math.floor(Math.random() * words.length);
-    setSelectedWord(words[randomIndex]);
+    setSelectedWord(words[randomIndex].word);
+    setWordDescription(words[randomIndex].description);
   };
 
   return (
